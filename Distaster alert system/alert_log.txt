@@ -1,0 +1,4 @@
+[HIGH] SEVERITY: HIGH | ZONE: GENERAL | MESSAGE: Excessive rainfall detected | TIME: 2026-04-21 23:21:21
+[CRITICAL] SEVERITY: CRITICAL | ZONE: East Zone | MESSAGE: Seismic activity detected | TIME: 2026-04-21 23:21:21
+[MODERATE] SEVERITY: MODERATE | ZONE: North Zone | MESSAGE: High temperature | TIME: 2026-04-21 23:21:21
+[HIGH] SEVERITY: HIGH | ZONE: South Zone | MESSAGE: Possible flood risk | TIME: 2026-04-21 23:21:21

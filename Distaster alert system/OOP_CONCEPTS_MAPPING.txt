@@ -1,0 +1,575 @@
+SMART DISASTER ALERT SYSTEM - OOP CONCEPTS MAPPING
+===================================================
+
+This document maps all Object-Oriented Programming concepts to specific implementations in the project.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+1. ENCAPSULATION
+───────────────────────────────────────────────────────────────────────────────
+
+DEFINITION: Bundling data and methods together, hiding internal details
+
+IMPLEMENTATIONS:
+
+A) Private Attributes with Public Methods
+   
+   MonitoringStation.java:
+   ├─ private String stationId → getStationId()
+   ├─ private List<String> historyLog → getHistoryLog()
+   └─ private ThresholdConfiguration thresholds → getThresholds()
+   
+   PredictionAnalysis.java:
+   ├─ private List<Double> historicalData → getHistoricalData()
+   ├─ private String parameter → getParameter()
+   └─ private Integer trendWindow (no direct access)
+   
+   AlertSystem.java:
+   ├─ private List<Alert> alertHistory → getAlertHistory()
+   ├─ private List<String> authorities → getAuthorities()
+   └─ private String logFilePath (controlled access)
+   
+   AdminPanel.java:
+   ├─ private List<MonitoringStation> stations → getAllStations()
+   └─ private AlertSystem alertSystem → getAlertSystem()
+
+B) Protected Members in Abstract Classes
+   
+   EnvironmentalData.java:
+   ├─ protected String zone
+   ├─ protected LocalDateTime timestamp
+   └─ protected Map<String, Double> readings
+   
+   Purpose: Allow child classes (MonitoringStation, DisasterDetection) 
+            to access while keeping private from external classes
+
+═══════════════════════════════════════════════════════════════════════════════
+
+2. ABSTRACTION
+───────────────────────────────────────────────────────────────────────────────
+
+DEFINITION: Showing only essential features, hiding complex implementation
+
+IMPLEMENTATIONS:
+
+A) Abstract Class
+   
+   EnvironmentalData:
+   ├─ public abstract void analyzeData() throws Exception
+   │  └─ Implemented by: MonitoringStation, DisasterDetection
+   │
+   └─ public abstract boolean isAbnormal()
+      └─ Implemented by: MonitoringStation, DisasterDetection
+   
+   Both child classes provide different implementations for same interface
+
+B) Interfaces as Contracts
+   
+   EnvironmentalMonitor:
+   ├─ void recordReading(String parameter, double value)
+   ├─ void displayReadings()
+   └─ LocalDateTime getLastUpdateTime()
+   ├─ Implemented by: MonitoringStation
+   └─ Enforces monitoring behavior
+   
+   AlertNotification:
+   ├─ void sendAlert(String severity, String message)
+   └─ void maintainAlertHistory()
+   ├─ Implemented by: AlertSystem
+   └─ Enforces notification behavior
+
+C) Hiding Implementation Details
+   
+   DisasterDetection:
+   ├─ Public: analyzeData(String disasterType)
+   └─ Private: detectFloodRisk(), detectEarthquakeRisk(), 
+              detectHeatwaveRisk(), detectStormRisk()
+   
+   Users only call analyzeData(); internal methods are hidden
+
+═══════════════════════════════════════════════════════════════════════════════
+
+3. INHERITANCE
+───────────────────────────────────────────────────────────────────────────────
+
+DEFINITION: One class extending another to reuse code and extend functionality
+
+IMPLEMENTATIONS:
+
+A) Single Level Inheritance
+   
+   Chain 1:
+   ┌─ EnvironmentalData (Abstract Base)
+   │  ├─ zone: String
+   │  ├─ timestamp: LocalDateTime
+   │  ├─ readings: Map<String, Double>
+   │  ├─ abstract analyzeData()
+   │  └─ abstract isAbnormal()
+   │
+   └─ MonitoringStation (Child)
+      ├─ Inherits all members from EnvironmentalData
+      ├─ stationId: String (new)
+      ├─ thresholds: ThresholdConfiguration (new)
+      ├─ recordReading(): void (new)
+      ├─ Implements EnvironmentalMonitor
+      └─ Overrides: analyzeData(), isAbnormal()
+   
+   Chain 2:
+   ┌─ EnvironmentalData (Abstract Base)
+   └─ DisasterDetection (Child)
+      ├─ Inherits all members from EnvironmentalData
+      ├─ detectedRisks: List<String> (new)
+      ├─ thresholdValues: Map<String, Double> (new)
+      ├─ Specialized disaster detection logic
+      └─ Overrides: analyzeData(), isAbnormal()
+
+B) Code Reuse Benefits
+   
+   Both child classes reuse:
+   ├─ zone property management
+   ├─ timestamp tracking
+   ├─ readings storage (Map<String, Double>)
+   ├─ addReading(), getReading() methods
+   └─ getAllReadings() method
+
+═══════════════════════════════════════════════════════════════════════════════
+
+4. POLYMORPHISM
+───────────────────────────────────────────────────────────────────────────────
+
+DEFINITION: Objects can take multiple forms; same interface, different behaviors
+
+IMPLEMENTATIONS:
+
+A) Method Overriding (Runtime Polymorphism)
+   
+   Base Class: EnvironmentalData
+   ├─ abstract analyzeData()
+   ├─ abstract isAbnormal()
+   
+   Derived Class 1: MonitoringStation
+   ├─ Validates readings
+   ├─ Checks thresholds
+   └─ Logs abnormal readings
+   
+   Derived Class 2: DisasterDetection
+   ├─ Analyzes for specific disasters
+   ├─ Detects flood/earthquake/heatwave/storm risks
+   └─ Returns list of detected risks
+   
+   Same method name, completely different behaviors
+
+B) Method Overloading (Compile-time Polymorphism)
+   
+   MonitoringStation.recordReading():
+   ├─ recordReading(String, double)
+   ├─ recordReading(String, double, String)
+   └─ recordReading(String...)
+   
+   Different parameter combinations, same operation intent
+   
+   AlertSystem.sendAlert():
+   ├─ sendAlert(String severity, String message)
+   ├─ sendAlert(String, String, String zone)
+   ├─ sendAlert(String, String, String, String contact)
+   └─ sendAlertToMultiple(String, String, String, String...)
+   
+   PredictionAnalysis.predictNextValue():
+   ├─ predictNextValue()
+   ├─ predictNextValue(int steps)
+   └─ predictWithConfidence(Integer threshold)
+
+C) Varargs as Polymorphic Flexibility
+   
+   EmergencyResponseManager.addContact():
+   ├─ addContact(String authority, String phoneNumber)
+   └─ addContact(String authority, String... contactDetails)
+   
+   Can accept any number of contact strings
+
+═══════════════════════════════════════════════════════════════════════════════
+
+5. NESTED CLASSES
+───────────────────────────────────────────────────────────────────────────────
+
+DEFINITION: A class defined inside another class
+
+IMPLEMENTATIONS:
+
+A) Static Nested Classes (Utility/Configuration)
+   
+   MonitoringStation.ThresholdConfiguration:
+   ├─ Purpose: Encapsulate threshold values
+   ├─ Static: Yes (no instance context needed)
+   ├─ Used by: MonitoringStation for validation
+   ├─ Access: MonitoringStation.ThresholdConfiguration
+   └─ Benefit: Logical grouping of related config
+   
+   Usage:
+   MonitoringStation.ThresholdConfiguration config = new MonitoringStation.ThresholdConfiguration();
+   config.setTemperatureMax(55.0);
+
+B) Static Nested Classes (Wrapper/Result)
+   
+   PredictionAnalysis.PredictionResult:
+   ├─ Purpose: Wrap prediction output
+   ├─ Contains: predictedValue, trend, confidence
+   ├─ Provides toString() for formatting
+   └─ Benefit: Type-safe result return
+   
+   AdminPanel.SystemStatistics:
+   ├─ Purpose: Wrap system metrics
+   ├─ Contains: activeStations, totalAlerts, etc.
+   └─ Benefit: Clean API for getting stats
+
+C) Static Nested Enum
+   
+   DisasterDetection.DisasterType:
+   ├─ FLOOD, EARTHQUAKE, HEATWAVE, STORM
+   ├─ Each has displayName property
+   └─ Benefit: Type-safe disaster constants
+
+D) Non-Static Nested Classes (Inner Classes)
+   
+   AlertSystem.Alert:
+   ├─ Purpose: Represent individual alerts
+   ├─ Static: No (has outer class context)
+   ├─ Can access: AlertSystem members
+   └─ Lifecycle: Tied to AlertSystem instance
+   
+   ReportGenerator.ReportEntry:
+   ├─ Purpose: Represent generated reports
+   ├─ Non-static for better integration
+   └─ Benefits from outer class methods
+   
+   EmergencyResponseManager.SafetyGuideline:
+   ├─ Purpose: Encapsulate safety info
+   ├─ Non-static for flexibility
+   └─ Accesses outer class members
+
+═══════════════════════════════════════════════════════════════════════════════
+
+6. EXCEPTION HANDLING
+───────────────────────────────────────────────────────────────────────────────
+
+DEFINITION: Catching and handling errors gracefully
+
+IMPLEMENTATIONS:
+
+A) Custom Exception Classes
+   
+   InvalidReadingException:
+   ├─ Extends: Exception
+   ├─ Thrown by: MonitoringStation.recordReading()
+   ├─ Reason: Environmental reading exceeds thresholds
+   └─ Caught in: App.java
+   
+   DisasterRiskException:
+   ├─ Extends: Exception
+   ├─ Thrown by: DisasterDetection.analyzeData()
+   ├─ Reason: Risk analysis fails or insufficient data
+   └─ Caught in: App.java
+   
+   AlertSystemException:
+   ├─ Extends: Exception
+   ├─ Thrown by: AlertSystem.saveAlertHistoryToFile()
+   ├─ Reason: File I/O operations fail
+   └─ Caught in: AlertSystem
+
+B) Standard Exception Handling
+   
+   IOException:
+   ├─ Thrown by: File I/O operations (BufferedWriter, FileWriter)
+   ├─ Caught in: ReportGenerator, AlertSystem
+   └─ Handled gracefully with error messages
+   
+   Exception (Generic):
+   ├─ Caught in: App.main() method
+   ├─ Purpose: Catch-all for unexpected errors
+   └─ Prints full stack trace for debugging
+
+C) Exception Propagation
+   
+   App.demonstrateEnvironmentalMonitoring():
+   └─ throws InvalidReadingException
+      └─ Called by: main() which catches Exception
+   
+   App.demonstrateDisasterDetection():
+   └─ throws DisasterRiskException
+      └─ Called by: main() which catches Exception
+
+═══════════════════════════════════════════════════════════════════════════════
+
+7. COLLECTIONS
+───────────────────────────────────────────────────────────────────────────────
+
+DEFINITION: Data structures for storing multiple objects
+
+IMPLEMENTATIONS:
+
+A) ArrayList (Dynamic Array)
+   
+   MonitoringStation:
+   └─ private List<String> historyLog = new ArrayList<>()
+   
+   AlertSystem:
+   └─ private List<Alert> alertHistory = new ArrayList<>()
+   
+   AdminPanel:
+   └─ private List<MonitoringStation> stations = new ArrayList<>()
+   
+   EmergencyResponseManager:
+   └─ private List<SafetyGuideline> guidelines = new ArrayList<>()
+
+B) HashMap (Key-Value Storage)
+   
+   EnvironmentalData:
+   └─ protected Map<String, Double> readings = new HashMap<>()
+   
+   DisasterDetection:
+   └─ private Map<String, Double> thresholdValues = new HashMap<>()
+   
+   EmergencyResponseManager:
+   └─ private Map<String, List<String>> contactInformation = new HashMap<>()
+
+C) List Interface
+   
+   PredictionAnalysis:
+   └─ List<Double> recentData (for trend calculation)
+   
+   ReportGenerator:
+   └─ List<ReportEntry> reports
+
+═══════════════════════════════════════════════════════════════════════════════
+
+8. INTERFACE IMPLEMENTATION
+───────────────────────────────────────────────────────────────────────────────
+
+DEFINITION: Contract that class must fulfill
+
+IMPLEMENTATIONS:
+
+A) EnvironmentalMonitor Interface
+   
+   Declares:
+   ├─ void recordReading(String parameter, double value)
+   ├─ void displayReadings()
+   └─ LocalDateTime getLastUpdateTime()
+   
+   Implemented by:
+   └─ MonitoringStation
+      ├─ recordReading() - Records & validates readings
+      ├─ displayReadings() - Formats output
+      └─ getLastUpdateTime() - Returns timestamp
+
+B) AlertNotification Interface
+   
+   Declares:
+   ├─ void sendAlert(String severity, String message)
+   └─ void maintainAlertHistory()
+   
+   Implemented by:
+   └─ AlertSystem
+      ├─ sendAlert() - Creates & logs alert
+      └─ maintainAlertHistory() - Saves to file
+
+═══════════════════════════════════════════════════════════════════════════════
+
+9. FILE I/O OPERATIONS
+───────────────────────────────────────────────────────────────────────────────
+
+DEFINITION: Reading from and writing to files
+
+IMPLEMENTATIONS:
+
+A) Writing to Files
+   
+   AlertSystem.saveAlertHistoryToFile():
+   ├─ Uses: BufferedWriter(new FileWriter(logFilePath, true))
+   ├─ Append mode: true (adds to existing content)
+   ├─ Writes: Each alert with timestamp
+   └─ File: alert_log.txt
+   
+   ReportGenerator.saveAllReportsToFile():
+   ├─ Uses: FileWriter(reportFilePath, false)
+   ├─ Overwrite mode: false creates new file
+   ├─ Writes: All generated reports
+   └─ File: reports.txt
+
+B) Reading from Files
+   
+   AlertSystem.loadAlertHistoryFromFile():
+   ├─ Uses: BufferedReader(new FileReader(logFilePath))
+   ├─ Reads: Line by line from alert_log.txt
+   ├─ Displays: Full alert history
+   └─ Error: Caught as AlertSystemException
+   
+   Design Pattern:
+   ├─ BufferedWriter/Reader for efficiency
+   └─ FileWriter/Reader for core I/O
+
+C) File Operations in Context
+   
+   AlertSystem.maintainAlertHistory():
+   └─ Public method calls private saveAlertHistoryToFile()
+      └─ Encapsulates file operation details
+   
+   ReportGenerator.generateReports():
+   └─ Multiple report methods → saveAllReportsToFile()
+      └─ Centralized file management
+
+═══════════════════════════════════════════════════════════════════════════════
+
+10. VARARGS (Variable Arguments)
+────────────────────────────────────────────────────────────────────────────────
+
+DEFINITION: Method parameter accepting variable number of arguments
+
+IMPLEMENTATIONS:
+
+A) String Varargs
+   
+   MonitoringStation.recordReadings(String... parameters):
+   └─ Accepts: Any number of String parameters
+      └─ Usage: recordReadings("temp", "humidity", "rainfall")
+   
+   DisasterDetection.analyzeMultipleParameters(String...):
+   └─ Accepts: Variable disaster parameter names
+      └─ Usage: analyzeMultipleParameters("temp", "rainfall", "seismic")
+
+B) Object Varargs
+   
+   AdminPanel.registerStations(MonitoringStation... stationArray):
+   └─ Accepts: Multiple MonitoringStation objects
+      └─ Usage: registerStations(station1, station2, station3, station4)
+
+C) Varargs with Other Parameters
+   
+   AlertSystem.sendAlertToMultiple(String severity, String message, 
+                                   String zone, String... recipients):
+   └─ Mixed: Fixed + variable parameters
+      └─ Usage: sendAlertToMultiple("HIGH", "Flood!", "North Zone", 
+                                     "Officer1", "Officer2", "Officer3")
+
+D) Varargs in Emergency Context
+   
+   EmergencyResponseManager.addContact(String authority, String...):
+   └─ Multiple contact details for single authority
+      └─ Usage: addContact("DMAuth", "email@gov.in", "1077", "24/7 Hotline")
+
+═══════════════════════════════════════════════════════════════════════════════
+
+11. WRAPPER CLASSES
+────────────────────────────────────────────────────────────────────────────────
+
+DEFINITION: Classes that "wrap" primitive or multiple values
+
+IMPLEMENTATIONS:
+
+A) PredictionResult (Wrapper Class)
+   
+   Location: PredictionAnalysis (static nested class)
+   
+   Wraps:
+   ├─ Double predictedValue
+   ├─ String trend
+   └─ Double confidence
+   
+   Methods:
+   ├─ getPredictedValue()
+   ├─ getTrend()
+   └─ getConfidence()
+   
+   Usage:
+   PredictionAnalysis.PredictionResult result = analysis.predictNextValue();
+   System.out.println(result.getPredictedValue());
+   
+   Benefits:
+   ├─ Type-safe result return
+   ├─ Easy to extend with more fields
+   └─ Clear API contract
+
+B) SystemStatistics (Wrapper Class)
+   
+   Location: AdminPanel (static nested class)
+   
+   Wraps:
+   ├─ Integer activeStations
+   ├─ Integer totalAlerts
+   ├─ Integer generatedReports
+   └─ Long systemUptime
+   
+   Methods:
+   ├─ Getters for each field
+   └─ toString() for formatted output
+   
+   Usage:
+   AdminPanel.SystemStatistics stats = admin.getSystemStatistics();
+   System.out.println(stats); // Formatted output
+   
+   Benefits:
+   ├─ Aggregates related metrics
+   ├─ Clean API for system info
+   └─ Easy serialization
+
+═══════════════════════════════════════════════════════════════════════════════
+
+12. COMPOSITION
+────────────────────────────────────────────────────────────────────────────────
+
+DEFINITION: Object contains instances of other classes
+
+IMPLEMENTATIONS:
+
+A) Has-A Relationship
+   
+   AdminPanel "has-a" AlertSystem:
+   ├─ private AlertSystem alertSystem
+   └─ Manages: Single alert system instance
+   
+   AdminPanel "has-a" List of MonitoringStation:
+   ├─ private List<MonitoringStation> stations
+   └─ Manages: Multiple station instances
+   
+   AlertSystem "has-a" List of Alert:
+   ├─ private List<Alert> alertHistory
+   └─ Contains: Multiple Alert instances
+   
+   MonitoringStation "has-a" ThresholdConfiguration:
+   ├─ private ThresholdConfiguration thresholds
+   └─ Contains: Threshold data
+
+B) Benefits of Composition
+   
+   ├─ Flexible object relationships
+   ├─ Easy to add/remove components
+   ├─ Better than deep inheritance
+   └─ Follows "Composition over Inheritance" principle
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SUMMARY TABLE
+──────────────────────────────────────────────────────────────────────────────
+
+Concept                    Count  Status  Key Examples
+─────────────────────────────────────────────────────────────────────────────
+Classes                      8     ✓     MonitoringStation, DisasterDetection
+Abstract Classes             1     ✓     EnvironmentalData
+Interfaces                   2     ✓     EnvironmentalMonitor, AlertNotification
+Inheritance Chains           2     ✓     MonitoringStation→EnvironmentalData
+Nested Classes (Static)      4     ✓     ThresholdConfiguration, PredictionResult
+Nested Classes (Non-static)  3     ✓     Alert, ReportEntry, SafetyGuideline
+Exception Types              3+    ✓     InvalidReadingException, etc.
+File I/O Operations          4+    ✓     BufferedWriter, FileWriter, etc.
+Overloaded Methods          10+    ✓     recordReading, sendAlert, etc.
+Overloaded Constructors      8+    ✓     MonitoringStation (3), AlertSystem (3)
+Varargs Methods              7+    ✓     recordReadings, sendAlertToMultiple
+Wrapper Classes              2     ✓     PredictionResult, SystemStatistics
+Collections Used             3+    ✓     ArrayList, HashMap, List
+Encapsulation Features      20+    ✓     Private/Protected/Public members
+Polymorphism Examples       20+    ✓     Method override, overload, varargs
+─────────────────────────────────────────────────────────────────────────────
+
+All requirements MET and EXCEEDED! ✓
+
+═══════════════════════════════════════════════════════════════════════════════
